@@ -5,6 +5,9 @@
 #include <iomanip>
 #include <algorithm>
 #include <sstream>
+#include <chrono>
+#include <cstdlib>
+#include <omp.h>
 
 
 using namespace std;
@@ -15,6 +18,7 @@ using namespace std;
 const double gamma_val = 1.4;   // Ratio of specific heats
 const double CFL = 0.5;         // CFL number
 
+#pragma omp declare target
 // ------------------------------------------------------------
 // Compute pressure from the conservative variables
 // ------------------------------------------------------------
@@ -50,14 +54,35 @@ void fluxY(double rho, double rhou, double rhov, double E,
     frhov = rhov * v + p;
     fE = (E + p) * v;
 }
+#pragma omp end declare target
 
 // ------------------------------------------------------------
 // Main simulation routine
 // ------------------------------------------------------------
-int main(){
+int main(int argc, char **argv){
     // ----- Grid and domain parameters -----
-    const int Nx = 200;         // Number of cells in x (excluding ghost cells)
-    const int Ny = 100;         // Number of cells in y
+    const int base_Nx = 200;
+    const int base_Ny = 100;
+    int scale = 1;
+    if (argc > 1) {
+        scale = atoi(argv[1]);
+        if (scale <= 0) {
+            cerr << "Scale must be positive\n";
+            return 1;
+        }
+    }
+
+    int nSteps = 2000;
+    if (argc > 2) {
+        nSteps = atoi(argv[2]);
+        if (nSteps <= 0) {
+            cerr << "nSteps must be positive\n";
+            return 1;
+        }
+    }
+
+    const int Nx = base_Nx * scale;         // Number of cells in x (excluding ghost cells)
+    const int Ny = base_Ny * scale;         // Number of cells in y
     const double Lx = 2.0;      // Domain length in x
     const double Ly = 1.0;      // Domain length in y
     const double dx = Lx / Nx;
@@ -104,6 +129,7 @@ int main(){
     const double E0 = p0/(gamma_val - 1.0) + 0.5*rho0*(u0*u0 + v0*v0);
 
     // ----- Initialize grid and obstacle mask -----
+#pragma omp parallel for collapse(2)
     for (int i = 0; i < Nx+2; i++){
         for (int j = 0; j < Ny+2; j++){
             // Compute cell center coordinates
@@ -131,13 +157,20 @@ int main(){
     double c0 = sqrt(gamma_val * p0 / rho0);
     double dt = CFL * min(dx, dy) / (fabs(u0) + c0)/2.0;
 
-    // ----- Time stepping parameters -----
-    const int nSteps = 2000;
-
     // ----- Main time-stepping loop -----
+    auto t_start = std::chrono::high_resolution_clock::now();
+#ifdef USE_GPU
+#pragma omp target data map(tofrom: rho[0:total_size], rhou[0:total_size], rhov[0:total_size], E[0:total_size], rho_new[0:total_size], rhou_new[0:total_size], rhov_new[0:total_size], E_new[0:total_size]) map(to: solid[0:total_size])
+{
+#endif
     for (int n = 0; n < nSteps; n++){
         // --- Apply boundary conditions on ghost cells ---
         // Left boundary (inflow): fixed free-stream state
+#ifdef USE_GPU
+#pragma omp target teams distribute parallel for
+#else
+#pragma omp parallel for
+#endif
         for (int j = 0; j < Ny+2; j++){
             rho[0*(Ny+2)+j] = rho0;
             rhou[0*(Ny+2)+j] = rho0*u0;
@@ -145,6 +178,11 @@ int main(){
             E[0*(Ny+2)+j] = E0;
         }
         // Right boundary (outflow): copy from the interior
+#ifdef USE_GPU
+#pragma omp target teams distribute parallel for
+#else
+#pragma omp parallel for
+#endif
         for (int j = 0; j < Ny+2; j++){
             rho[(Nx+1)*(Ny+2)+j] = rho[Nx*(Ny+2)+j];
             rhou[(Nx+1)*(Ny+2)+j] = rhou[Nx*(Ny+2)+j];
@@ -152,6 +190,11 @@ int main(){
             E[(Nx+1)*(Ny+2)+j] = E[Nx*(Ny+2)+j];
         }
         // Bottom boundary: reflective
+#ifdef USE_GPU
+#pragma omp target teams distribute parallel for
+#else
+#pragma omp parallel for
+#endif
         for (int i = 0; i < Nx+2; i++){
             rho[i*(Ny+2)+0] = rho[i*(Ny+2)+1];
             rhou[i*(Ny+2)+0] = rhou[i*(Ny+2)+1];
@@ -159,6 +202,11 @@ int main(){
             E[i*(Ny+2)+0] = E[i*(Ny+2)+1];
         }
         // Top boundary: reflective
+#ifdef USE_GPU
+#pragma omp target teams distribute parallel for
+#else
+#pragma omp parallel for
+#endif
         for (int i = 0; i < Nx+2; i++){
             rho[i*(Ny+2)+(Ny+1)] = rho[i*(Ny+2)+Ny];
             rhou[i*(Ny+2)+(Ny+1)] = rhou[i*(Ny+2)+Ny];
@@ -167,6 +215,11 @@ int main(){
         }
 
         // --- Update interior cells using a Lax-Friedrichs scheme ---
+#ifdef USE_GPU
+#pragma omp target teams distribute parallel for collapse(2)
+#else
+#pragma omp parallel for collapse(2)
+#endif
         for (int i = 1; i <= Nx; i++){
             for (int j = 1; j <= Ny; j++){
                 // If the cell is inside the solid obstacle, do not update it
@@ -215,6 +268,11 @@ int main(){
         }
 
         // Copy updated values back
+#ifdef USE_GPU
+#pragma omp target teams distribute parallel for collapse(2)
+#else
+#pragma omp parallel for collapse(2)
+#endif
         for (int i = 1; i <= Nx; i++){
             for (int j = 1; j <= Ny; j++){
                 rho[i*(Ny+2)+j] = rho_new[i*(Ny+2)+j];
@@ -223,23 +281,46 @@ int main(){
                 E[i*(Ny+2)+j] = E_new[i*(Ny+2)+j];
             }
         }
+    }
+#ifdef USE_GPU
+}
+#endif
+    auto t_end = std::chrono::high_resolution_clock::now();
+    const double runtime_s = std::chrono::duration<double>(t_end - t_start).count();
 
-        // Calculate total kinetic energy
-        double total_kinetic = 0.0;
-        for (int i = 1; i <= Nx; i++) {
-            for (int j = 1; j <= Ny; j++) {
-                double u = rhou[i*(Ny+2)+j] / rho[i*(Ny+2)+j];
-                double v = rhov[i*(Ny+2)+j] / rho[i*(Ny+2)+j];
-                total_kinetic += 0.5 * rho[i*(Ny+2)+j] * (u * u + v * v);
-            }
-        }
-
-        // Optional: output progress and write VTK file every 50 time steps
-        if (n % 50 == 0) {
-            cout << "Step " << n << " completed, total kinetic energy: " << total_kinetic << endl;
+    // Calculate total kinetic energy after the timed solve for validation.
+    double total_kinetic = 0.0;
+#pragma omp parallel for collapse(2) reduction(+:total_kinetic)
+    for (int i = 1; i <= Nx; i++) {
+        for (int j = 1; j <= Ny; j++) {
+            double u = rhou[i*(Ny+2)+j] / rho[i*(Ny+2)+j];
+            double v = rhov[i*(Ny+2)+j] / rho[i*(Ny+2)+j];
+            total_kinetic += 0.5 * rho[i*(Ny+2)+j] * (u * u + v * v);
         }
     }
 
+#ifdef USE_GPU
+    const char *mode = "gpu";
+#else
+    const char *mode = "cpu";
+#endif
+    cout << fixed << setprecision(6);
+    cout << "mode=" << mode
+         << ",scale=" << scale
+         << ",Nx=" << Nx
+         << ",Ny=" << Ny
+         << ",nSteps=" << nSteps
+         << ",runtime_s=" << runtime_s
+         << ",final_kinetic=" << total_kinetic << "\n";
+
+    free(rho);
+    free(rhou);
+    free(rhov);
+    free(E);
+    free(rho_new);
+    free(rhou_new);
+    free(rhov_new);
+    free(E_new);
+    free(solid);
     return 0;
 }
-
