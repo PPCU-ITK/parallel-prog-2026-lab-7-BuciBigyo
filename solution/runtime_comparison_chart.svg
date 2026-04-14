@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+<rect width="100%" height="100%" fill="#fbfbf7"/>
+<text x="500.0" y="32" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1f2937">Lab 7 CFD Euler: CPU vs GPU runtime</text>
+<text x="500.0" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#657083">OpenMP CPU build compared with OpenMP target GPU offload, 2000 time steps</text>
+<text x="377.5" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1f2937">Runtime, log scale</text>
+<line x1="85" y1="480.0" x2="670" y2="480.0" stroke="#d9dde7" stroke-width="1"/>
+<text x="73" y="484.0" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#657083">0.1s</text>
+<line x1="85" y1="343.3" x2="670" y2="343.3" stroke="#d9dde7" stroke-width="1"/>
+<text x="73" y="347.3" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#657083">1s</text>
+<line x1="85" y1="206.7" x2="670" y2="206.7" stroke="#d9dde7" stroke-width="1"/>
+<text x="73" y="210.7" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#657083">10s</text>
+<line x1="85" y1="70.0" x2="670" y2="70.0" stroke="#d9dde7" stroke-width="1"/>
+<text x="73" y="74.0" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#657083">100s</text>
+<line x1="85" y1="70" x2="85" y2="480" stroke="#1f2937" stroke-width="1.2"/>
+<line x1="85" y1="480" x2="670" y2="480" stroke="#1f2937" stroke-width="1.2"/>
+<polyline points="85.0,439.4 280.0,280.5 475.0,178.5 670.0,83.9" fill="none" stroke="#2f5597" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="85.0" cy="439.4" r="5" fill="#2f5597"/>
+<text x="85.0" y="430.4" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2f5597">0.198s</text>
+<circle cx="280.0" cy="280.5" r="5" fill="#2f5597"/>
+<text x="280.0" y="271.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2f5597">2.88s</text>
+<circle cx="475.0" cy="178.5" r="5" fill="#2f5597"/>
+<text x="475.0" y="169.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2f5597">16.1s</text>
+<circle cx="670.0" cy="83.9" r="5" fill="#2f5597"/>
+<text x="670.0" y="74.9" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2f5597">79.1s</text>
+<polyline points="85.0,377.8 280.0,375.3 475.0,343.1 670.0,302.2" fill="none" stroke="#2e7d32" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="85.0" cy="377.8" r="5" fill="#2e7d32"/>
+<text x="85.0" y="393.8" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2e7d32">0.559s</text>
+<circle cx="280.0" cy="375.3" r="5" fill="#2e7d32"/>
+<text x="280.0" y="391.3" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2e7d32">0.584s</text>
+<circle cx="475.0" cy="343.1" r="5" fill="#2e7d32"/>
+<text x="475.0" y="359.1" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2e7d32">1s</text>
+<circle cx="670.0" cy="302.2" r="5" fill="#2e7d32"/>
+<text x="670.0" y="318.2" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2e7d32">2s</text>
+<text x="85.0" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">1x</text>
+<text x="85.0" y="526" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#657083">200x100</text>
+<text x="280.0" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">4x</text>
+<text x="280.0" y="526" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#657083">800x400</text>
+<text x="475.0" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">8x</text>
+<text x="475.0" y="526" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#657083">1600x800</text>
+<text x="670.0" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">16x</text>
+<text x="670.0" y="526" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#657083">3200x1600</text>
+<text x="377.5" y="597" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#657083">Grid scale, with Nx x Ny shown below</text>
+<rect x="93" y="71" width="150" height="48" rx="8" fill="#ffffff" stroke="#d9dde7"/>
+<line x1="105" y1="88" x2="133" y2="88" stroke="#2f5597" stroke-width="3"/>
+<circle cx="119" cy="88" r="4" fill="#2f5597"/>
+<text x="143" y="92" font-family="Arial, sans-serif" font-size="13" fill="#1f2937">CPU</text>
+<line x1="105" y1="111" x2="133" y2="111" stroke="#2e7d32" stroke-width="3"/>
+<circle cx="119" cy="111" r="4" fill="#2e7d32"/>
+<text x="143" y="115" font-family="Arial, sans-serif" font-size="13" fill="#1f2937">GPU</text>
+<text x="840.0" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1f2937">GPU speedup</text>
+<line x1="735" y1="480" x2="945" y2="480" stroke="#1f2937" stroke-width="1.2"/>
+<line x1="735" y1="70" x2="735" y2="480" stroke="#1f2937" stroke-width="1.2"/>
+<rect x="750.0" y="476.7" width="33.8" height="3.3" fill="#c55a11" rx="4"/>
+<text x="766.9" y="468.7" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#c55a11">0.4x</text>
+<text x="766.9" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">1x</text>
+<rect x="798.8" y="434.3" width="33.8" height="45.7" fill="#c55a11" rx="4"/>
+<text x="815.6" y="426.3" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#c55a11">4.9x</text>
+<text x="815.6" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">4x</text>
+<rect x="847.5" y="331.8" width="33.8" height="148.2" fill="#c55a11" rx="4"/>
+<text x="864.4" y="323.8" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#c55a11">16.0x</text>
+<text x="864.4" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">8x</text>
+<rect x="896.2" y="113.9" width="33.8" height="366.1" fill="#c55a11" rx="4"/>
+<text x="913.1" y="105.9" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#c55a11">39.6x</text>
+<text x="913.1" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">16x</text>
+<text x="840.0" y="528" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#657083">CPU time / GPU time</text>
+<text x="500.0" y="614" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#657083">For the default small grid the GPU is slower; after that the larger grids benefit from offload.</text>
+</svg>

@@ -1,0 +1,1 @@
+mode=gpu,scale=16,Nx=3200,Ny=1600,nSteps=2000,runtime_s=1.999538,final_kinetic=2455631.834816

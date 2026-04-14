@@ -2,7 +2,13 @@
 
 I added an OpenMP GPU version of `cfd_euler.cpp` and compared it to a CPU OpenMP build.
 
-The timings are in `runtime_comparison.csv`. I used the default grid and then scaled both `Nx` and `Ny` by 4, 8, and 16.
+The timings are in `runtime_comparison.csv`. I also added a chart in `runtime_comparison_chart.svg` so the CPU/GPU comparison is easier to read.
+
+![CPU and GPU runtime comparison](runtime_comparison_chart.svg)
+
+I used the default grid and then scaled both `Nx` and `Ny` by 4, 8, and 16.
+
+Extra files that are not needed for the main result are in `supporting_files/`. That folder has the GPU compiler report and the raw one-line outputs from each run.
 
 Build commands used:
 

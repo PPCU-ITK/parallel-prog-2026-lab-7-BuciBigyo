@@ -1,0 +1,1 @@
+mode=cpu,scale=1,Nx=200,Ny=100,nSteps=2000,runtime_s=0.198047,final_kinetic=7748.702398
